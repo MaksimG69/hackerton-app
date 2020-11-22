@@ -22,13 +22,13 @@ const {
   SHOPIFY_API_KEY,
   HOST,
 } = process.env;
-
+const serve = require('koa-static');
 app.prepare().then(() => {
   const server = new Koa();
   const router = new Router();
+
   server.use(session({ sameSite: 'none', secure: true }, server));
   server.keys = [SHOPIFY_API_SECRET_KEY];
-
   server.use(
     createShopifyAuth({
       apiKey: SHOPIFY_API_KEY,
@@ -75,7 +75,8 @@ app.prepare().then(() => {
 
   server.use(router.allowedMethods());
   server.use(router.routes());
-
+  //Problem
+  server.use(serve('./loader'));
   server.listen(port, () => {
     console.log(`> Ready on http://localhost:${port}`);
   });
