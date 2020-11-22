@@ -14,6 +14,7 @@ const getSubscriptionUrl = require('./server/getSubscriptionUrl');
 const Shopify = require('shopify-api-node');
 const serve = require('koa-static');
 const bodyParser = require('koa-body');
+const cors = require('@koa/cors');
 
 const db = require('./server/database.handler');
 const shippingHandler = require('./server/shipping.handler');
@@ -41,7 +42,7 @@ app.prepare().then(() => {
     createShopifyAuth({
       apiKey: SHOPIFY_API_KEY,
       secret: SHOPIFY_API_SECRET_KEY,
-      scopes: ['read_products', 'write_products', 'write_shipping' ],
+      scopes: ['read_products', 'write_products', 'write_shipping', 'write_script_tags' ],
       async afterAuth(ctx) {
         const { shop, accessToken } = ctx.session;
         ctx.cookies.set("shopOrigin", shop, {
@@ -49,6 +50,19 @@ app.prepare().then(() => {
           secure: true,
           sameSite: 'none'
         });
+
+        const shopify = new Shopify({
+          shopName: shop,
+          accessToken,
+        });
+
+        // TODO delete old scripts
+
+        shopify.scriptTag.create({
+          event: 'onload',
+          src: `${HOST}/shipping-loader.js`,
+          display_scope: 'all',
+        })
 
         console.log(shop, accessToken)
       }
@@ -61,7 +75,9 @@ app.prepare().then(() => {
     console.log('received webhook: ', ctx.state.webhook);
   });
   
-  router.get('/public-config', async (ctx) => {
+  router.get('/public-config', cors({
+    origin: '*',
+  }),async (ctx) => {
 
     // TODO: shop query
     const shop = 'shipping-hackathon.myshopify.com';
