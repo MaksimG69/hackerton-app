@@ -2,8 +2,7 @@
     "shipping-hackathon.myshopify.com": {
         "enabled": true,
         "postion": "above",
-        "title": "Estimated Shipping",
-        "subtitle": "to {country}",
+        "shippingText": "Shipping",
         "freeShippingText": "Free Shipping",
         "currencySymbol": "€",
         "textHex": "#000000",

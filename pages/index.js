@@ -6,8 +6,7 @@ class Index extends React.Component {
   state = {
     enabled: false,
     postion: 'above',
-    title: 'Estimated Shipping',
-    subtitle: 'to {country}',
+    shippingText: 'Shipping',
     freeShippingText: 'Free Shipping',
     currencySymbol: '€',
     textHex: '#000000',
@@ -46,8 +45,7 @@ class Index extends React.Component {
         config: {
           enabled: this.state.enabled,
           postion: this.state.postion,
-          title: this.state.title,
-          subtitle: this.state.subtitle,
+          shippingText: this.state.shippingText,
           freeShippingText: this.state.freeShippingText,
           currencySymbol: this.state.currencySymbol,
           textHex: this.state.textHex,
@@ -58,7 +56,6 @@ class Index extends React.Component {
     .then(response => response.json())
     .then(({ success }) => {
       if (success) {
-        // this.setState({ updatingCss: false, cssUpdated: true  });
         console.log(success);
       } else {
         console.error(success);
@@ -99,10 +96,7 @@ class Index extends React.Component {
                   />
                 </Stack.Item>
                 <Stack.Item>
-                  <TextField label="Title" placeholder="Estimated Shipping" value={this.state.title} onChange={(change) => this.setState({title: change})} />
-                </Stack.Item>
-                <Stack.Item>
-                  <TextField label="Subtitle pattern" placeholder="to {country}" value={this.state.subtitle} onChange={(change) => this.setState({subtitle: change})} />
+                  <TextField label="Shipping Text" placeholder="Estimated Shipping" value={this.state.shippingText} onChange={(change) => this.setState({shippingText: change})} />
                 </Stack.Item>
                 <Stack.Item>
                   <TextField label="Free shipping text" placeholder="Free Shipping" value={this.state.freeShippingText} onChange={(change) => this.setState({freeShippingText: change})} />
