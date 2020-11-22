@@ -1,7 +1,6 @@
-import { EmptyState, Layout, Page } from '@shopify/polaris';
-import { ResourcePicker, TitleBar } from '@shopify/app-bridge-react';
+import { Button, Layout, Page, Card, Stack, Select, TextField } from '@shopify/polaris';
+import { TitleBar } from '@shopify/app-bridge-react';
 import store from 'store-js';
-import ResourceListWithProducts from '../components/ResourceList';
 
 const img = 'https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg';
 
@@ -12,34 +11,40 @@ class Index extends React.Component {
     return (
       <Page>
         <TitleBar
-          title="Sample App"
+          title="Settings"
           primaryAction={{
           content: 'Select products',
           onAction: () => this.setState({ open: true }),
         }} />
-        <ResourcePicker
-          resourceType="Product"
-          showVariants={false}
-          open={this.state.open}
-          onSelection={(resources) => this.handleSelection(resources)}
-          onCancel={() => this.setState({ open: false })}
-        />
-        {emptyState ? (
-          <Layout>
-            <EmptyState
-              heading="Discount your products temporarily"
-              action={{
-                content: 'Select products',
-                onAction: () => this.setState({ open: true }),
-              }}
-              image={img}
-            >
-              <p>Select products to change their price temporarily.</p>
-            </EmptyState>
-          </Layout>
-        ) : (
-            <ResourceListWithProducts />
-          )}
+
+<Layout.AnnotatedSection
+          title="Custom CSS"
+          description="Configure Estimated Shipping Cost"
+          >
+          <Card>
+            <Card.Section>
+              <Stack alignment="fill">
+                <Stack.Item>
+                  <Select
+                      label="Widget Position"
+                  />
+                </Stack.Item>
+                <Stack.Item>
+                  <TextField label="Title" />
+                </Stack.Item>
+                <Stack.Item>
+                  <TextField label="Subtitle pattern" />
+                </Stack.Item>
+                <Stack.Item>
+                  <TextField label="Free shipping text" />
+                </Stack.Item>
+                <Stack.Item>
+                  <TextField label="Display Currency symbol or design" />
+                </Stack.Item>
+              </Stack>
+            </Card.Section>
+          </Card>
+        </Layout.AnnotatedSection>        
       </Page>
     );
   }
