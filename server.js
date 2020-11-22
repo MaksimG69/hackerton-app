@@ -16,6 +16,7 @@ const serve = require('koa-static');
 const bodyParser = require('koa-body');
 
 const db = require('./server/database.handler');
+const shippingHandler = require('./server/shipping.handler');
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
@@ -64,10 +65,12 @@ app.prepare().then(() => {
 
     // TODO: shop query
     const shop = 'shipping-hackathon.myshopify.com';
+    const country = 'DE';
 
     if (typeof shop !== "undefined") {
       const config = db.getConfig(shop);
-      ctx.body = { success: true, config }
+      const shipping = shippingHandler.get(country, shop);
+      ctx.body = { success: true, config, shipping }
     } else {
       ctx.body = { success: false }
     }
