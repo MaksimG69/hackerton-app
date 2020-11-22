@@ -13,6 +13,9 @@ const { receiveWebhook, registerWebhook } = require('@shopify/koa-shopify-webhoo
 const getSubscriptionUrl = require('./server/getSubscriptionUrl');
 const Shopify = require('shopify-api-node');
 const serve = require('koa-static');
+const bodyParser = require('koa-body');
+
+const db = require('./server/database.handler');
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
@@ -31,6 +34,7 @@ app.prepare().then(() => {
   server.use(session({ sameSite: 'none', secure: true }, server));
   server.keys = [SHOPIFY_API_SECRET_KEY];
   server.use(serve('public'));
+  server.use(bodyParser());
 
   server.use(
     createShopifyAuth({
@@ -54,6 +58,43 @@ app.prepare().then(() => {
 
   router.post('/webhooks/products/create', webhook, (ctx) => {
     console.log('received webhook: ', ctx.state.webhook);
+  });
+  
+  router.get('/public-config', async (ctx) => {
+
+    // TODO: shop query
+    const shop = 'shipping-hackathon.myshopify.com';
+
+    if (typeof shop !== "undefined") {
+      const config = db.getConfig(shop);
+      ctx.body = { success: true, config }
+    } else {
+      ctx.body = { success: false }
+    }
+  });
+
+  router.get('/config', verifyRequest(), async (ctx) => {
+    const { shop } = ctx.session;
+
+    if (typeof shop !== "undefined") {
+      const config = db.getConfig(shop);
+      ctx.body = { success: true, config }
+    } else {
+      ctx.body = { success: false }
+    }
+  });
+
+  router.put('/config', verifyRequest(), async (ctx) => {
+    const body = ctx.request.body;
+
+    const { shop } = ctx.session;
+
+    if (typeof body !== "undefined" && typeof body.config !== "undefined" && typeof shop !== "undefined") {
+      db.saveConfig(shop, body.config);
+      ctx.body = { success: true }
+    } else {
+      ctx.body = { success: false }
+    }
   });
 
   server.use(graphQLProxy({ version: ApiVersion.July20 }));

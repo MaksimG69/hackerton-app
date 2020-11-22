@@ -2,12 +2,10 @@ import { Button, Layout, Page, Card, Stack, Select, TextField, CalloutCard, Sett
 import { TitleBar } from '@shopify/app-bridge-react';
 import store from 'store-js';
 
-const img = 'https://cdn.shopify.com/s/files/1/0757/9955/files/empty-state.svg';
-
 class Index extends React.Component {
   state = {
     enabled: false,
-    postion: 'today',
+    postion: 'above',
     title: 'Estimated Shipping',
     subtitle: 'to {country}',
     freeShippingText: 'Free Shipping',
@@ -15,13 +13,69 @@ class Index extends React.Component {
     textHex: '#000000',
     backgroundHex: '#ffffff',
   };
+
+  componentDidMount() {
+    this.getConfig();
+  }
+
+  getConfig() {
+    fetch("/config")
+    .then(res => res.json())
+    .then(({ success, config }) => {
+        if (success) {
+          this.setState({ ...config });
+        } else {
+          console.error(success, css);
+        }
+      }
+    )
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+  }
+
+  saveConfig() {
+    this.setState({ updatingCss: true })
+
+    fetch('/config', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        config: {
+          enabled: this.state.enabled,
+          postion: this.state.postion,
+          title: this.state.title,
+          subtitle: this.state.subtitle,
+          freeShippingText: this.state.freeShippingText,
+          currencySymbol: this.state.currencySymbol,
+          textHex: this.state.textHex,
+          backgroundHex: this.state.backgroundHex,
+        }
+      }),
+    })
+    .then(response => response.json())
+    .then(({ success }) => {
+      if (success) {
+        // this.setState({ updatingCss: false, cssUpdated: true  });
+        console.log(success);
+      } else {
+        console.error(success);
+      }
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+  }
+
   render() {
     const contentStatus = this.state.enabled ? 'Disable' : 'Enable';
     const textStatus = this.state.enabled ? 'enabled' : 'disabled';
 
     const options = [
-      {label: 'Above add to cart', value: 'today'},
-      {label: 'Below add to cart', value: 'yesterday'},
+      {label: 'Above add to cart', value: 'above'},
+      {label: 'Below add to cart', value: 'below'},
     ];
 
     const handleSelectChange = (selected) => {
@@ -98,7 +152,7 @@ class Index extends React.Component {
           title="Settings"
           primaryAction={{
           content: 'Save',
-          onAction: () => this.setState({ enabled: true }),
+          onAction: () => this.saveConfig(),
         }} />
         <Layout.AnnotatedSection
           title="Activate Shipping Price"
