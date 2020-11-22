@@ -1,3 +1,7 @@
+/** 
+ * At the moment shipping information is mocked ¯\_(ツ)_/¯
+ * **/
+
 const get = (country) => {
   let shippingInfo = {};
 
